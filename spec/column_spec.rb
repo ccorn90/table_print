@@ -55,6 +55,11 @@ describe Column do
       c.name = "a horse is a horse of course of course"
       c.data_width.should == 38
     end
+
+    it "doesn't count escape characters" do
+      c.data[1] = "\e[32m#{c.data[1]}\e[0m"
+      c.data_width.should == 33
+    end
   end
 
   describe "#width" do

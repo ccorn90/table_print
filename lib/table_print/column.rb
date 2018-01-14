@@ -33,16 +33,24 @@ module TablePrint
       @formatters << formatter
     end
 
+    def strip_escape(value)
+      value.gsub(%r{\e[^m]*m}, '')
+    end
+
     def data_width
+      stripped_strings = Array(data).compact.map(&:to_s).map do |m|
+        strip_escape(m)
+      end
+
       if multibyte_count
         [
           name.each_char.collect{|c| c.bytesize == 1 ? 1 : 2}.inject(0, &:+),
-          Array(data).compact.collect(&:to_s).collect{|m| m.each_char.collect{|n| n.bytesize == 1 ? 1 : 2}.inject(0, &:+)}.max
+          stripped_strings.collect{|m| m.each_char.collect{|n| n.bytesize == 1 ? 1 : 2}.inject(0, &:+)}.max
         ].compact.max || 0
       else
         [
           name.length,
-          Array(data).compact.collect(&:to_s).collect(&:length).max
+          stripped_strings.collect(&:length).max
         ].compact.max || 0
       end
     end

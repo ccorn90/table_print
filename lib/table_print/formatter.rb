@@ -25,7 +25,7 @@ module TablePrint
     end
 
     def format(value)
-      padding = width - length(value.to_s)
+      padding = width - length(strip_escape(value.to_s))
       truncate(value) + (padding < 0 ? '' : " " * padding)
     end
 
@@ -34,9 +34,13 @@ module TablePrint
       return "" unless value
 
       value = value.to_s
-      return value unless value.length > width
+      return value unless strip_escape(value).length > width
 
       "#{value[0..width-4]}..."
+    end
+
+    def strip_escape(value)
+      value.gsub(%r{\e[^m]*m}, '')
     end
 
     def length(str)
